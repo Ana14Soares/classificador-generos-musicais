@@ -4,7 +4,7 @@
 Curso de Engenharia da Computação — Instituto Federal do Ceará (IFCE)
 Professor: Valberto Feitosa
 
-**Equipe:** Ana Luiza Soares · Ana Virna Sousa Carvalho · Maria Fernanda Braga Queiroz
+**Equipe 07:** Ana Luiza Soares · Ana Virna Sousa Carvalho · Maria Fernanda Braga Queiroz
 
 Solução completa de *Machine Learning*, da análise da base de dados até a
 disponibilização do modelo treinado em uma aplicação web.
