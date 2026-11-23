@@ -1,0 +1,77 @@
+{
+  "projeto": "Classificacao de generos musicais com Naive Bayes",
+  "disciplina": "Probabilidade e Estatistica - IFCE",
+  "treinado_em": "2026-11-22 22:59:03",
+  "versao_scikit_learn": "1.6.1",
+  "versao_python": "3.9.6",
+  "base_de_dados": {
+    "nome": "Spotify Tracks Dataset",
+    "fonte": "https://www.kaggle.com/datasets/maharshipandya/-spotify-tracks-dataset",
+    "observacoes_originais": 114000,
+    "generos_originais": 114,
+    "observacoes_apos_preprocessamento": 9435
+  },
+  "algoritmo": "Naive Bayes Categórico com discretização por quantis",
+  "pipeline": [
+    "discretizar",
+    "nb"
+  ],
+  "melhores_hiperparametros": {
+    "discretizar__n_bins": 24,
+    "discretizar__strategy": "quantile",
+    "nb__alpha": 0.1
+  },
+  "variavel_alvo": "track_genre",
+  "classes": [
+    "classical",
+    "comedy",
+    "death-metal",
+    "forro",
+    "hip-hop",
+    "jazz",
+    "opera",
+    "reggaeton",
+    "sleep",
+    "techno"
+  ],
+  "rotulos_classes": {
+    "classical": "Música Clássica",
+    "comedy": "Comédia / Falado",
+    "death-metal": "Death Metal",
+    "forro": "Forró",
+    "hip-hop": "Hip-Hop",
+    "jazz": "Jazz",
+    "opera": "Ópera",
+    "reggaeton": "Reggaeton",
+    "sleep": "Sleep / Relaxamento",
+    "techno": "Techno"
+  },
+  "features": [
+    "danceability",
+    "energy",
+    "loudness",
+    "speechiness",
+    "acousticness",
+    "instrumentalness",
+    "liveness",
+    "valence",
+    "tempo",
+    "duration_ms",
+    "explicit",
+    "popularity"
+  ],
+  "n_treino": 7548,
+  "n_teste": 1887,
+  "metricas_teste": {
+    "acuracia": 0.8283,
+    "precisao_macro": 0.8278,
+    "revocacao_macro": 0.8263,
+    "f1_macro": 0.8261,
+    "precisao_ponderada": 0.8292,
+    "revocacao_ponderada": 0.8283,
+    "f1_ponderado": 0.8278,
+    "confianca_media_acerto": 0.9343,
+    "confianca_media_erro": 0.7562
+  },
+  "f1_macro_validacao_cruzada": 0.8092
+}

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classificador de Gêneros Musicais — Naive Bayes</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+  <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
+</head>
+<body>
+
+<header class="cabecalho">
+  <div class="cabecalho-conteudo">
+    <div class="marca">
+      <span class="marca-icone">🎵</span>
+      <div>
+        <h1>Classificador de Gêneros Musicais</h1>
+        <p class="subtitulo">Naive Bayes aplicado às características acústicas do Spotify</p>
+      </div>
+    </div>
+    <div class="indicadores">
+      <div class="indicador">
+        <strong>{{ '%.1f'|format(metadados.metricas_teste.acuracia * 100) }}%</strong>
+        <span>acurácia</span>
+      </div>
+      <div class="indicador">
+        <strong>{{ metadados.classes|length }}</strong>
+        <span>gêneros</span>
+      </div>
+      <div class="indicador">
+        <strong>{{ '{:,}'.format(metadados.base_de_dados.observacoes_apos_preprocessamento).replace(',', '.') }}</strong>
+        <span>faixas</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- ------------------------------------------------ painel do formulario -->
+  <section class="cartao formulario-area">
+    <div class="cartao-topo">
+      <h2>Características da faixa</h2>
+      <p>Ajuste os atributos acústicos e o modelo indicará o gênero mais provável.</p>
+    </div>
+
+    <div class="acoes-rapidas">
+      <button type="button" class="btn btn-secundario" id="btn-exemplo">
+        🎲 Carregar faixa real da base
+      </button>
+      <select id="seletor-genero" class="seletor" aria-label="Filtrar exemplo por gênero">
+        <option value="">Qualquer gênero</option>
+        {% for c in classes %}
+          <option value="{{ c }}">{{ emojis[c] }} {{ rotulos[c] }}</option>
+        {% endfor %}
+      </select>
+      <button type="button" class="btn btn-texto" id="btn-limpar">Restaurar padrões</button>
+    </div>
+
+    <div id="faixa-carregada" class="faixa-carregada oculto">
+      <span class="faixa-rotulo">Faixa carregada</span>
+      <strong id="faixa-nome"></strong>
+      <span id="faixa-artista"></span>
+      <span class="etiqueta-real">gênero real: <b id="faixa-genero"></b></span>
+    </div>
+
+    <form id="formulario" novalidate>
+      <div class="grade-campos">
+        {% for f in features %}
+          {% set i = info[f] %}
+          <div class="campo" data-feature="{{ f }}">
+            <label for="campo-{{ f }}">
+              {{ i.rotulo }}
+              <span class="dica" tabindex="0" role="note"
+                    aria-label="{{ i.descricao }}" data-dica="{{ i.descricao }}">?</span>
+            </label>
+
+            {% if f == 'explicit' %}
+              <div class="alternador">
+                <input type="checkbox" id="campo-{{ f }}-check" class="alternador-check">
+                <label for="campo-{{ f }}-check" class="alternador-visual"></label>
+                <span class="alternador-texto" id="texto-{{ f }}">Não</span>
+                <input type="hidden" id="campo-{{ f }}" name="{{ f }}" value="0"
+                       data-min="0" data-max="1">
+              </div>
+            {% else %}
+              <div class="linha-controle">
+                <input type="range" id="faixa-{{ f }}" class="deslizante"
+                       min="{{ i.min }}" max="{{ i.max }}" step="{{ i.passo }}"
+                       value="{{ i.padrao }}">
+                <input type="number" id="campo-{{ f }}" name="{{ f }}"
+                       class="numero" min="{{ i.min }}" max="{{ i.max }}"
+                       step="{{ i.passo }}" value="{{ i.padrao }}"
+                       data-min="{{ i.min }}" data-max="{{ i.max }}"
+                       data-padrao="{{ i.padrao }}">
+              </div>
+              {% if f == 'duration_ms' %}
+                <small class="auxiliar" id="auxiliar-duration">≈ 3min 30s</small>
+              {% endif %}
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="rodape-formulario">
+        <button type="submit" class="btn btn-primario" id="btn-prever">
+          <span class="btn-texto-conteudo">Prever gênero</span>
+          <span class="carregando oculto" aria-hidden="true"></span>
+        </button>
+        <p class="aviso-erro oculto" id="aviso-erro" role="alert"></p>
+      </div>
+    </form>
+  </section>
+
+  <!-- ----------------------------------------------------- painel resultado -->
+  <aside class="coluna-lateral">
+
+    <section class="cartao resultado-area" id="resultado" aria-live="polite">
+      <div class="estado-vazio" id="estado-vazio">
+        <div class="estado-vazio-icone">🎧</div>
+        <h3>Aguardando previsão</h3>
+        <p>Preencha o formulário e clique em <strong>Prever gênero</strong>.</p>
+      </div>
+
+      <div class="resultado-conteudo oculto" id="resultado-conteudo">
+        <span class="resultado-rotulo">Gênero previsto</span>
+        <div class="resultado-principal">
+          <span class="resultado-emoji" id="resultado-emoji"></span>
+          <h3 id="resultado-genero"></h3>
+        </div>
+
+        <div class="medidor-confianca">
+          <div class="medidor-topo">
+            <span>Confiança do modelo</span>
+            <strong id="resultado-confianca"></strong>
+          </div>
+          <div class="medidor-trilha">
+            <div class="medidor-barra" id="medidor-barra"></div>
+          </div>
+          <p class="texto-confianca" id="texto-confianca"></p>
+        </div>
+
+        <div class="comparacao oculto" id="comparacao">
+          <span id="comparacao-texto"></span>
+        </div>
+
+        <div class="ranking">
+          <h4>Probabilidade por gênero</h4>
+          <ul id="lista-ranking"></ul>
+        </div>
+
+        <p class="nota-rodape">
+          As probabilidades vêm de <code>predict_proba</code> do Naive Bayes.
+          Por causa da hipótese de independência entre atributos, elas tendem a
+          ser otimistas e devem ser lidas como <em>ordem de preferência</em>
+          entre os gêneros, não como probabilidades calibradas.
+        </p>
+      </div>
+    </section>
+
+    <section class="cartao sobre-area">
+      <h3>Sobre o modelo</h3>
+      <dl class="lista-descricao">
+        <dt>Algoritmo</dt><dd>{{ metadados.algoritmo }}</dd>
+        <dt>Base de dados</dt>
+        <dd>
+          {{ metadados.base_de_dados.nome }} —
+          {{ '{:,}'.format(metadados.base_de_dados.observacoes_originais).replace(',', '.') }}
+          faixas, {{ metadados.base_de_dados.generos_originais }} gêneros
+        </dd>
+        <dt>Variável-alvo</dt><dd><code>{{ metadados.variavel_alvo }}</code> ({{ metadados.classes|length }} classes)</dd>
+        <dt>Variáveis preditoras</dt><dd>{{ metadados.features|length }} atributos</dd>
+        <dt>Treino / teste</dt>
+        <dd>{{ '{:,}'.format(metadados.n_treino).replace(',', '.') }} /
+            {{ '{:,}'.format(metadados.n_teste).replace(',', '.') }} faixas (80 / 20)</dd>
+      </dl>
+
+      <div class="metricas-grade">
+        <div><strong>{{ '%.3f'|format(metadados.metricas_teste.acuracia) }}</strong><span>Acurácia</span></div>
+        <div><strong>{{ '%.3f'|format(metadados.metricas_teste.precisao_macro) }}</strong><span>Precisão</span></div>
+        <div><strong>{{ '%.3f'|format(metadados.metricas_teste.revocacao_macro) }}</strong><span>Revocação</span></div>
+        <div><strong>{{ '%.3f'|format(metadados.metricas_teste.f1_macro) }}</strong><span>F1-Score</span></div>
+      </div>
+      <p class="nota-rodape">
+        Métricas medidas no conjunto de teste, com média macro entre as
+        {{ metadados.classes|length }} classes. O acaso acertaria 10%.
+      </p>
+    </section>
+
+  </aside>
+</main>
+
+<footer class="rodape">
+  <p>
+    Trabalho Final de <strong>Probabilidade e Estatística</strong> ·
+    Engenharia da Computação · IFCE ·
+    Professor Valberto Feitosa
+  </p>
+  <p class="rodape-fino">
+    Modelo treinado em {{ metadados.treinado_em }} ·
+    scikit-learn {{ metadados.versao_scikit_learn }} ·
+    Base: Spotify Tracks Dataset (Kaggle)
+  </p>
+</footer>
+
+<script>
+  window.CONFIG = {
+    features: {{ features|tojson }},
+    info: {{ info|tojson }}
+  };
+</script>
+<script src="{{ url_for('static', filename='aplicacao.js') }}"></script>
+</body>
+</html>

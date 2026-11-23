@@ -1,0 +1,4 @@
+recorte,n_classes,n_faixas,acuracia,f1_macro,acaso,ganho_sobre_acaso
+(a) todos os 114 generos originais,114,113392,0.2726,0.2535,0.0088,31.08
+(b) 10 generos proximos (rock e variacoes),10,6160,0.5438,0.4917,0.1,5.44
+(c) 10 generos contrastantes (adotado),10,9435,0.8283,0.8261,0.1,8.28

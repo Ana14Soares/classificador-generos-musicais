@@ -1,0 +1,21 @@
+# Trabalho Final - Probabilidade e Estatistica (IFCE)
+# Classificacao de generos musicais com Naive Bayes
+#
+# Instalacao:
+#   python -m venv .venv
+#   source .venv/bin/activate      (Windows: .venv\Scripts\activate)
+#   pip install -r requirements.txt
+
+# --- analise de dados e modelagem ---
+pandas==2.3.3
+numpy==2.0.2
+scikit-learn==1.6.1
+scipy==1.13.1
+joblib==1.5.3
+
+# --- visualizacao (analise exploratoria e figuras do relatorio) ---
+matplotlib==3.9.4
+seaborn==0.13.2
+
+# --- aplicacao web ---
+Flask==3.1.3

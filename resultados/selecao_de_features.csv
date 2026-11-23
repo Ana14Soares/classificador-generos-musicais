@@ -1,0 +1,5 @@
+conjunto,n_features,Yeo-Johnson + GaussianNB,Discretizacao + CategoricalNB
+(A) apenas atributos acusticos,10,0.6768,0.7299
+"(B) A + key, mode, time_signature",13,0.6671,0.7308
+"(C) A + explicit, popularity [adotado]",12,0.6069,0.8138
+(D) todas as variaveis disponiveis,15,0.5976,0.8144

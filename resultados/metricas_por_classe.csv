@@ -1,0 +1,11 @@
+,rotulo,precisao,revocacao,f1_score,suporte
+classical,Música Clássica,0.7692,0.7303,0.7493,178.0
+comedy,Comédia / Falado,0.9344,0.8593,0.8953,199.0
+death-metal,Death Metal,0.8539,0.9444,0.8969,198.0
+forro,Forró,0.893,0.96,0.9253,200.0
+hip-hop,Hip-Hop,0.7616,0.7486,0.755,175.0
+jazz,Jazz,0.8152,0.7614,0.7874,197.0
+opera,Ópera,0.772,0.7842,0.7781,190.0
+reggaeton,Reggaeton,0.759,0.8362,0.7957,177.0
+sleep,Sleep / Relaxamento,0.9125,0.8439,0.8769,173.0
+techno,Techno,0.8071,0.795,0.801,200.0

@@ -1,0 +1,27 @@
+# Ambiente virtual
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+
+# Observacao: os arquivos abaixo SAO versionados de proposito, pois fazem
+# parte da entrega do trabalho:
+#   modelo/*.joblib      -> modelo treinado exigido pelo enunciado
+#   relatorio/figuras/   -> figuras citadas no relatorio
+#   resultados/*.csv     -> tabelas geradas pelos scripts
+#   dados/raw/dataset.csv (20 MB) -> base de dados utilizada.
+#       Se preferir nao versionar a base, descomente a linha a seguir;
+#       o link para download esta no README.
+# dados/raw/dataset.csv
